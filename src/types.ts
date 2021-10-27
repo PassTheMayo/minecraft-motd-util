@@ -40,6 +40,10 @@ export interface CleanOptions {
     formattingCharacter?: string
 }
 
+export interface FormatOptions {
+    formattingCharacter?: string
+}
+
 export interface SerializerElementOption {
     classes?: string[],
     styles?: Record<string, string>
