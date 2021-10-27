@@ -1,8 +1,9 @@
 {
-	"name": "mc-motd-parser",
-	"version": "1.0.0",
+	"name": "minecraft-motd-util",
+	"version": "1.0.1",
 	"description": "Parse and convert a Minecraft MOTD into various formats.",
 	"main": "src/index.js",
+	"typings": "dist/index.d.ts",
 	"scripts": {
 		"build": "tsc",
 		"test": "node test/parse.js"
