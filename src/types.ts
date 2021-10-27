@@ -16,6 +16,8 @@ export type ColorNames = 'black'
     | 'white'
     | 'minecoin_gold';
 
+export type ColorCodes = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g';
+
 export type FormattingProperties = 'bold' | 'italics' | 'underline' | 'strikethrough' | 'obfuscated';
 
 export interface ParseItem {
@@ -46,4 +48,15 @@ export interface SerializerElementOption {
 export interface HTMLOptions {
     serializers?: Record<ColorNames | FormattingProperties, SerializerElementOption>,
     mergeSimilar?: boolean
+}
+
+export interface Chat {
+    text: string,
+    color?: ColorNames | ColorCodes,
+    bold?: string,
+    italic?: string,
+    underlined?: string,
+    strikethrough?: string,
+    obfuscated?: string,
+    extra?: Chat[]
 }

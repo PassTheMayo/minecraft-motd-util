@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { ParseOptions, ParseResult, ParseItem, ColorNames, FormattingProperties } from './types';
+import { ParseOptions, ParseResult, ParseItem, ColorNames, FormattingProperties, Chat } from './types';
 
 const colorLookupNames: Record<string, ColorNames> = {
     '0': 'black',
@@ -29,13 +29,7 @@ const formattingLookupProperties: Record<string, FormattingProperties> = {
     'o': 'italics'
 };
 
-export const parse = (text: string, options?: ParseOptions): ParseResult => {
-    assert(typeof text === 'string', `Expected 'text' to be typeof 'string', received '${typeof text}'`);
-
-    options = Object.assign({
-        formattingCharacter: '\u00A7'
-    }, options);
-
+const parseText = (text: string, options: ParseOptions): ParseResult => {
     const result: ParseItem[] = [{ text: '' }];
 
     let buf = text;
@@ -71,4 +65,68 @@ export const parse = (text: string, options?: ParseOptions): ParseResult => {
     }
 
     return result;
-}
+};
+
+const parseChat = (chat: Chat, options: ParseOptions): ParseResult => {
+    const result: ParseItem[] = [];
+
+    const parseItem = (chat: Chat, parent: Chat | null): ParseResult => {
+        const result: ParseResult = [];
+
+        const item: ParseItem = { text: chat.text };
+
+        if (((parent && parent.bold === 'true') && (chat.bold !== 'false' || !chat.bold)) || chat.bold === 'true') {
+            item.bold = true;
+        }
+
+        if (((parent && parent.italic === 'true') && (chat.italic !== 'false' || !chat.italic)) || chat.italic === 'true') {
+            item.italics = true;
+        }
+
+        if (((parent && parent.underlined === 'true') && (chat.underlined !== 'false' || !chat.underlined)) || chat.underlined === 'true') {
+            item.underline = true;
+        }
+
+        if (((parent && parent.strikethrough === 'true') && (chat.strikethrough !== 'false' || !chat.strikethrough)) || chat.strikethrough === 'true') {
+            item.strikethrough = true;
+        }
+
+        if (((parent && parent.obfuscated === 'true') && (chat.obfuscated !== 'false' || !chat.obfuscated)) || chat.obfuscated === 'true') {
+            item.obfuscated = true;
+        }
+
+        if (chat.color) {
+            if (Object.keys(colorLookupNames).includes(chat.color)) {
+                item.color = colorLookupNames[chat.color];
+            } else {
+                item.color = chat.color as ColorNames;
+            }
+        }
+
+        result.push(item);
+
+        if (chat.extra) {
+            for (const extra of chat.extra) {
+                result.push(...parseItem(extra, chat));
+            }
+        }
+
+        return result;
+    };
+
+    return parseItem(chat, null);
+};
+
+export const parse = (text: Chat | string, options?: ParseOptions): ParseResult => {
+    assert(typeof text === 'string' || typeof text === 'object', `Expected 'text' to be typeof 'string' or 'object', received '${typeof text}'`);
+
+    const opts = Object.assign({
+        formattingCharacter: '\u00A7'
+    }, options);
+
+    if (typeof text === 'string') {
+        return parseText(text, opts);
+    }
+
+    return parseChat(text, opts);
+};
