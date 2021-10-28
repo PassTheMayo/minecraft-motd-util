@@ -1,8 +1,8 @@
 {
 	"name": "minecraft-motd-util",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "Parse and convert a Minecraft MOTD into various formats.",
-	"main": "src/index.js",
+	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
 	"scripts": {
 		"build": "tsc",
@@ -10,7 +10,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/PassTheMayo/mc-motd-parser.git"
+		"url": "git+https://github.com/PassTheMayo/minecraft-motd-util.git"
 	},
 	"keywords": [
 		"minecraft",
@@ -21,9 +21,9 @@
 	"author": "Jacob Gunther",
 	"license": "GPL-3.0-or-later",
 	"bugs": {
-		"url": "https://github.com/PassTheMayo/mc-motd-parser/issues"
+		"url": "https://github.com/PassTheMayo/minecraft-motd-util/issues"
 	},
-	"homepage": "https://github.com/PassTheMayo/mc-motd-parser#readme",
+	"homepage": "https://github.com/PassTheMayo/minecraft-motd-util#readme",
 	"devDependencies": {
 		"@types/node": "^16.11.6",
 		"@typescript-eslint/eslint-plugin": "^5.2.0",
