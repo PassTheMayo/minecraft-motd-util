@@ -67,66 +67,60 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
     return result;
 };
 
-const parseChat = (chat: Chat, options: ParseOptions): ParseResult => {
-    const result: ParseItem[] = [];
+const parseChat = (chat: Chat, parent?: Chat): ParseResult => {
+    const result: ParseResult = [];
 
-    const parseItem = (chat: Chat, parent: Chat | null): ParseResult => {
-        const result: ParseResult = [];
+    const item: ParseItem = { text: chat.text };
 
-        const item: ParseItem = { text: chat.text };
+    if (((parent && parent.bold === 'true') && (chat.bold !== 'false' || !chat.bold)) || chat.bold === 'true') {
+        item.bold = true;
+    }
 
-        if (((parent && parent.bold === 'true') && (chat.bold !== 'false' || !chat.bold)) || chat.bold === 'true') {
-            item.bold = true;
+    if (((parent && parent.italic === 'true') && (chat.italic !== 'false' || !chat.italic)) || chat.italic === 'true') {
+        item.italics = true;
+    }
+
+    if (((parent && parent.underlined === 'true') && (chat.underlined !== 'false' || !chat.underlined)) || chat.underlined === 'true') {
+        item.underline = true;
+    }
+
+    if (((parent && parent.strikethrough === 'true') && (chat.strikethrough !== 'false' || !chat.strikethrough)) || chat.strikethrough === 'true') {
+        item.strikethrough = true;
+    }
+
+    if (((parent && parent.obfuscated === 'true') && (chat.obfuscated !== 'false' || !chat.obfuscated)) || chat.obfuscated === 'true') {
+        item.obfuscated = true;
+    }
+
+    if (chat.color) {
+        if (Object.keys(colorLookupNames).includes(chat.color)) {
+            item.color = colorLookupNames[chat.color];
+        } else {
+            item.color = chat.color as ColorNames;
         }
+    }
 
-        if (((parent && parent.italic === 'true') && (chat.italic !== 'false' || !chat.italic)) || chat.italic === 'true') {
-            item.italics = true;
+    result.push(item);
+
+    if (chat.extra) {
+        for (const extra of chat.extra) {
+            result.push(...parseChat(extra, chat));
         }
+    }
 
-        if (((parent && parent.underlined === 'true') && (chat.underlined !== 'false' || !chat.underlined)) || chat.underlined === 'true') {
-            item.underline = true;
-        }
-
-        if (((parent && parent.strikethrough === 'true') && (chat.strikethrough !== 'false' || !chat.strikethrough)) || chat.strikethrough === 'true') {
-            item.strikethrough = true;
-        }
-
-        if (((parent && parent.obfuscated === 'true') && (chat.obfuscated !== 'false' || !chat.obfuscated)) || chat.obfuscated === 'true') {
-            item.obfuscated = true;
-        }
-
-        if (chat.color) {
-            if (Object.keys(colorLookupNames).includes(chat.color)) {
-                item.color = colorLookupNames[chat.color];
-            } else {
-                item.color = chat.color as ColorNames;
-            }
-        }
-
-        result.push(item);
-
-        if (chat.extra) {
-            for (const extra of chat.extra) {
-                result.push(...parseItem(extra, chat));
-            }
-        }
-
-        return result;
-    };
-
-    return parseItem(chat, null);
+    return result;
 };
 
-export const parse = (text: Chat | string, options?: ParseOptions): ParseResult => {
-    assert(typeof text === 'string' || typeof text === 'object', `Expected 'text' to be typeof 'string' or 'object', received '${typeof text}'`);
+export const parse = (input: Chat | string, options?: ParseOptions): ParseResult => {
+    assert(typeof input === 'string' || typeof input === 'object', `Expected 'input' to be typeof 'string' or 'object', received '${typeof input}'`);
 
     const opts = Object.assign({
         formattingCharacter: '\u00A7'
     }, options);
 
-    if (typeof text === 'string') {
-        return parseText(text, opts);
+    if (typeof input === 'string') {
+        return parseText(input, opts);
     }
 
-    return parseChat(text, opts);
+    return parseChat(input);
 };
