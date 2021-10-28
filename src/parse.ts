@@ -67,10 +67,10 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
     return result;
 };
 
-const parseChat = (chat: Chat, parent?: Chat): ParseResult => {
-    const result: ParseResult = [];
+const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResult => {
+    const result: ParseResult = parseText(chat.text, options);
 
-    const item: ParseItem = { text: chat.text };
+    const item: ParseItem = result[0];
 
     if (((parent && parent.bold === 'true') && (chat.bold !== 'false' || !chat.bold)) || chat.bold === 'true') {
         item.bold = true;
@@ -104,7 +104,7 @@ const parseChat = (chat: Chat, parent?: Chat): ParseResult => {
 
     if (chat.extra) {
         for (const extra of chat.extra) {
-            result.push(...parseChat(extra, chat));
+            result.push(...parseChat(extra, options, chat));
         }
     }
 
@@ -122,5 +122,5 @@ export const parse = (input: Chat | string, options?: ParseOptions): ParseResult
         return parseText(input, opts);
     }
 
-    return parseChat(input);
+    return parseChat(input, opts);
 };
