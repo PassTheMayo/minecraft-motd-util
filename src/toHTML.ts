@@ -88,7 +88,7 @@ export const toHTML = (tree: ParseResult, options?: HTMLOptions): string => {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
 
-        result += `<span${classes.length > 0 ? ` class="${classes.join(' ')}"` : ''}${Object.keys(styles).length > 0 ? ` style="${Object.entries(styles).map((style) => `${style[0]}: ${style[1].join(', ')};`).join(' ')}"` : ''}>${content}</span>`;
+        result += `<span${classes.length > 0 ? ` class="${classes.join(' ')}"` : ''}${Object.keys(styles).length > 0 ? ` style="${Object.entries(styles).map((style) => `${style[0]}: ${style[1].join(' ')};`).join(' ')}"` : ''}>${content}</span>`;
     }
 
     result += `</${opts.rootTag}>`;
