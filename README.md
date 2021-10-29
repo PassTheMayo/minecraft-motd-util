@@ -1,4 +1,4 @@
-# mc-motd-parser
+# minecraft-motd-util
 Parse and convert a Minecraft MOTD into various formats.
 
 ## Installation
