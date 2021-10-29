@@ -30,7 +30,7 @@ const formattingLookupProperties: Record<string, FormattingProperties> = {
 };
 
 const parseText = (text: string, options: ParseOptions): ParseResult => {
-    const result: ParseItem[] = [{ text: '' }];
+    const result: ParseItem[] = [{ text: '', color: 'white' }];
 
     let buf = text;
 
@@ -43,17 +43,17 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
             let item: ParseItem = result[result.length - 1];
 
             if (formattingCode === 'r') {
-                result.push({ text: '' });
-            } else if (Object.prototype.hasOwnProperty.call(colorLookupNames, formattingCode)) {
-                const newColor = colorLookupNames[formattingCode];
-
-                if (newColor !== item.color && item.text.length > 0) {
-                    result.push({ color: newColor, text: '' });
-                } else {
-                    item.color = newColor;
+                result.push({ text: '', color: 'white' });
+            } else {
+                if (formattingCode in formattingLookupProperties) {
+                    if (item.text.length > 0) {
+                        result.push({ ...item, text: '', [formattingLookupProperties[formattingCode]]: true })
+                    } else {
+                        item[formattingLookupProperties[formattingCode]] = true;
+                    }
+                } else if (formattingCode in colorLookupNames) {
+                    result.push({ text: '', color: colorLookupNames[formattingCode] });
                 }
-            } else if (Object.prototype.hasOwnProperty.call(formattingLookupProperties, formattingCode)) {
-                item[formattingLookupProperties[formattingCode]] = true;
             }
 
             buf = buf.slice(2);
@@ -64,7 +64,7 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
         }
     }
 
-    return result;
+    return result.filter((item) => item.text.length > 0);
 };
 
 const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResult => {

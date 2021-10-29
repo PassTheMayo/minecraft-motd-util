@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { ParseResult, HTMLOptions, ColorNames, FormattingProperties, SerializerElementOption } from './types';
+import { ParseResult, HTMLOptions, ColorNames, SerializerElementOption, FormattingProperties } from './types';
 
 const defaultSerializers: Record<ColorNames | FormattingProperties, SerializerElementOption> = {
     'black': { styles: { color: '#000000' } },
@@ -24,7 +24,9 @@ const defaultSerializers: Record<ColorNames | FormattingProperties, SerializerEl
     'strikethrough': { styles: { 'text-decoration': 'line-through' } },
     'underline': { styles: { 'text-decoration': 'underline' } },
     'italics': { styles: { 'font-style': 'italic' } }
-}
+};
+
+const formattingProps: FormattingProperties[] = ['bold', 'italics', 'underline', 'strikethrough', 'obfuscated'];
 
 export const toHTML = (tree: ParseResult, options?: HTMLOptions): string => {
     assert(Array.isArray(tree), `Expected 'tree' to be typeof 'array', received '${typeof tree}'`);
@@ -38,42 +40,46 @@ export const toHTML = (tree: ParseResult, options?: HTMLOptions): string => {
 
     for (const item of tree) {
         const classes = [];
-        const styles = {};
+        const styles: Record<string, string[]> = {};
 
         if (item.color) {
-            classes.push(...(opts.serializers[item.color].classes ?? []));
+            const serializer = opts.serializers[item.color];
 
-            Object.assign(styles, opts.serializers[item.color].styles ?? {});
+            classes.push(...(serializer.classes ?? []));
+
+            if (serializer.styles) {
+                for (const style in serializer.styles) {
+                    const value = serializer.styles[style];
+
+                    if (style in styles) {
+                        styles[style].push(value);
+                    } else {
+                        styles[style] = [value]
+                    }
+                }
+            }
         }
 
-        if (item.bold) {
-            classes.push(...(opts.serializers.bold.classes ?? []));
+        for (const key of formattingProps) {
+            if (item[key]) {
+                const serializer = opts.serializers[key];
 
-            Object.assign(styles, opts.serializers.bold.styles ?? {});
-        }
+                if (serializer.classes && serializer.classes.length > 0) {
+                    classes.push(...serializer.classes);
+                }
 
-        if (item.italics) {
-            classes.push(...(opts.serializers.italics.classes ?? []));
+                if (serializer.styles) {
+                    for (const style in serializer.styles) {
+                        const value = serializer.styles[style];
 
-            Object.assign(styles, opts.serializers.italics.styles ?? {});
-        }
-
-        if (item.underline) {
-            classes.push(...(opts.serializers.underline.classes ?? []));
-
-            Object.assign(styles, opts.serializers.underline.styles ?? {});
-        }
-
-        if (item.strikethrough) {
-            classes.push(...(opts.serializers.strikethrough.classes ?? []));
-
-            Object.assign(styles, opts.serializers.strikethrough.styles ?? {});
-        }
-
-        if (item.obfuscated) {
-            classes.push(...(opts.serializers.obfuscated.classes ?? []));
-
-            Object.assign(styles, opts.serializers.obfuscated.styles ?? {});
+                        if (style in styles) {
+                            styles[style].push(value);
+                        } else {
+                            styles[style] = [value]
+                        }
+                    }
+                }
+            }
         }
 
         const content = item.text.replace(/&/g, '&amp;')
@@ -82,7 +88,7 @@ export const toHTML = (tree: ParseResult, options?: HTMLOptions): string => {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
 
-        result += `<span${classes.length > 0 ? ` class="${classes.join(' ')}"` : ''}${Object.keys(styles).length > 0 ? ` style="${Object.entries(styles).map((style) => `${style[0]}: ${style[1]};`).join(' ')}"` : ''}>${content}</span>`;
+        result += `<span${classes.length > 0 ? ` class="${classes.join(' ')}"` : ''}${Object.keys(styles).length > 0 ? ` style="${Object.entries(styles).map((style) => `${style[0]}: ${style[1].join(', ')};`).join(' ')}"` : ''}>${content}</span>`;
     }
 
     result += `</${opts.rootTag}>`;

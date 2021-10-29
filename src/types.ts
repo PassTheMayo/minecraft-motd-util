@@ -21,7 +21,7 @@ export type ColorCodes = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '
 export type FormattingProperties = 'bold' | 'italics' | 'underline' | 'strikethrough' | 'obfuscated';
 
 export interface ParseItem {
-    color?: ColorNames,
+    color: ColorNames,
     bold?: boolean,
     italics?: boolean,
     underline?: boolean,
@@ -51,7 +51,7 @@ export interface SerializerElementOption {
 
 export interface HTMLOptions {
     serializers?: Record<ColorNames | FormattingProperties, SerializerElementOption>,
-    mergeSimilar?: boolean
+    rootTag?: string
 }
 
 export interface Chat {

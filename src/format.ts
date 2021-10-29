@@ -1,4 +1,5 @@
 import assert from 'assert';
+import { parse } from './parse';
 import { FormatOptions, ParseResult, ColorNames, ColorCodes } from './types';
 
 const colorLookupCodes: Record<ColorNames, ColorCodes> = {
@@ -21,8 +22,12 @@ const colorLookupCodes: Record<ColorNames, ColorCodes> = {
     'minecoin_gold': 'g'
 };
 
-export const format = (tree: ParseResult, options?: FormatOptions): string => {
-    assert(Array.isArray(tree), `Expected 'tree' to be typeof 'array', got '${typeof tree}'`);
+export const format = (input: string | ParseResult, options?: FormatOptions): string => {
+    assert(typeof input === 'string' || Array.isArray(input), `Expected 'input' to be typeof 'array' or typeof 'string', got '${typeof input}'`);
+
+    if (typeof input === 'string') {
+        input = parse(input, options);
+    }
 
     const opts = Object.assign({
         formattingCharacter: '\u00A7'
@@ -30,7 +35,7 @@ export const format = (tree: ParseResult, options?: FormatOptions): string => {
 
     let result = '';
 
-    for (const item of tree) {
+    for (const item of input) {
         if (item.color) {
             result += opts.formattingCharacter + colorLookupCodes[item.color];
         }
