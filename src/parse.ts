@@ -64,7 +64,7 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
         }
     }
 
-    return result.filter((item) => item.text.length > 0);
+    return result;
 };
 
 const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResult => {
@@ -100,8 +100,6 @@ const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResul
         }
     }
 
-    result.push(item);
-
     if (chat.extra) {
         for (const extra of chat.extra) {
             result.push(...parseChat(extra, options, chat));
@@ -118,9 +116,13 @@ export const parse = (input: Chat | string, options?: ParseOptions): ParseResult
         formattingCharacter: '\u00A7'
     }, options);
 
+    let result;
+
     if (typeof input === 'string') {
-        return parseText(input, opts);
+        result = parseText(input, opts);
+    } else {
+        result = parseChat(input, opts).filter((item) => item.text.length > 0);
     }
 
-    return parseChat(input, opts);
+    return result.filter((item) => item.text.length > 0);
 };
