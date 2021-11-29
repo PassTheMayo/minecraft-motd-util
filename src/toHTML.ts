@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { ParseResult, HTMLOptions, SerializerElementOption, FormattingProperties } from './types';
+import { ParseResult, HTMLOptions, SerializerElementOption } from './types';
 
 const defaultSerializers: Record<string, SerializerElementOption> = {
     'black': { styles: { color: '#000000' } },

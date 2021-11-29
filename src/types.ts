@@ -1,27 +1,7 @@
-export type ColorNames = 'black'
-    | 'dark_blue'
-    | 'dark_green'
-    | 'dark_aqua'
-    | 'dark_red'
-    | 'dark_purple'
-    | 'gold'
-    | 'gray'
-    | 'dark_gray'
-    | 'blue'
-    | 'green'
-    | 'aqua'
-    | 'red'
-    | 'light_purple'
-    | 'yellow'
-    | 'white'
-    | 'minecoin_gold';
-
-export type ColorCodes = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g';
-
 export type FormattingProperties = 'bold' | 'italics' | 'underline' | 'strikethrough' | 'obfuscated';
 
 export interface ParseItem {
-    color: ColorNames,
+    color: string,
     bold?: boolean,
     italics?: boolean,
     underline?: boolean,
@@ -41,7 +21,8 @@ export interface CleanOptions {
 }
 
 export interface FormatOptions {
-    formattingCharacter?: string
+    formattingCharacter?: string,
+    replaceNearestColor?: boolean
 }
 
 export interface SerializerElementOption {
@@ -50,13 +31,13 @@ export interface SerializerElementOption {
 }
 
 export interface HTMLOptions {
-    serializers?: Record<ColorNames | FormattingProperties, SerializerElementOption>,
+    serializers?: Record<string | FormattingProperties, SerializerElementOption>,
     rootTag?: string
 }
 
 export interface Chat {
     text: string,
-    color?: ColorNames | ColorCodes,
+    color?: string,
     bold?: string,
     italic?: string,
     underlined?: string,

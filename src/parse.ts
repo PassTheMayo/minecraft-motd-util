@@ -1,7 +1,7 @@
 import assert from 'assert';
-import { ParseOptions, ParseResult, ParseItem, ColorNames, FormattingProperties, Chat } from './types';
+import { ParseOptions, ParseResult, ParseItem, FormattingProperties, Chat } from './types';
 
-const colorLookupNames: Record<string, ColorNames> = {
+const colorLookupNames: Record<string, string> = {
     '0': 'black',
     '1': 'dark_blue',
     '2': 'dark_green',
@@ -96,7 +96,7 @@ const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResul
         if (Object.keys(colorLookupNames).includes(chat.color)) {
             item.color = colorLookupNames[chat.color];
         } else {
-            item.color = chat.color as ColorNames;
+            item.color = chat.color;
         }
     }
 
