@@ -1,7 +1,7 @@
 import assert from 'assert';
-import { ParseResult, HTMLOptions, ColorNames, SerializerElementOption, FormattingProperties } from './types';
+import { ParseResult, HTMLOptions, SerializerElementOption, FormattingProperties } from './types';
 
-const defaultSerializers: Record<ColorNames | FormattingProperties, SerializerElementOption> = {
+const defaultSerializers: Record<string, SerializerElementOption> = {
     'black': { styles: { color: '#000000' } },
     'dark_blue': { styles: { color: '#0000AA' } },
     'dark_green': { styles: { color: '#00AA00' } },
@@ -26,8 +26,6 @@ const defaultSerializers: Record<ColorNames | FormattingProperties, SerializerEl
     'italics': { styles: { 'font-style': 'italic' } }
 };
 
-const formattingProps: FormattingProperties[] = ['bold', 'italics', 'underline', 'strikethrough', 'obfuscated'];
-
 export const toHTML = (tree: ParseResult, options?: HTMLOptions): string => {
     assert(Array.isArray(tree), `Expected 'tree' to be typeof 'array', received '${typeof tree}'`);
 
@@ -42,43 +40,31 @@ export const toHTML = (tree: ParseResult, options?: HTMLOptions): string => {
         const classes = [];
         const styles: Record<string, string[]> = {};
 
-        if (item.color) {
-            const serializer = opts.serializers[item.color];
+        for (const prop in item) {
+            if (prop === 'text') continue;
 
-            classes.push(...(serializer.classes ?? []));
+            const serializer = opts.serializers[prop === 'color' ? item[prop] : prop];
 
-            if (serializer.styles) {
-                for (const style in serializer.styles) {
-                    const value = serializer.styles[style];
-
-                    if (style in styles) {
-                        styles[style].push(value);
-                    } else {
-                        styles[style] = [value]
-                    }
-                }
-            }
-        }
-
-        for (const key of formattingProps) {
-            if (item[key]) {
-                const serializer = opts.serializers[key];
-
+            if (serializer) {
                 if (serializer.classes && serializer.classes.length > 0) {
                     classes.push(...serializer.classes);
                 }
 
                 if (serializer.styles) {
-                    for (const style in serializer.styles) {
-                        const value = serializer.styles[style];
-
-                        if (style in styles) {
-                            styles[style].push(value);
-                        } else {
-                            styles[style] = [value]
+                    for (const attr in serializer.styles) {
+                        if (!(attr in styles)) {
+                            styles[attr] = [];
                         }
+
+                        styles[attr].push(serializer.styles[attr]);
                     }
                 }
+            } else if (prop === 'color') {
+                if (!('color' in styles)) {
+                    styles.color = [];
+                }
+
+                styles.color.push(item[prop]);
             }
         }
 

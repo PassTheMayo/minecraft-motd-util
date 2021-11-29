@@ -32,13 +32,13 @@ const formattingLookupProperties: Record<string, FormattingProperties> = {
 const parseText = (text: string, options: ParseOptions): ParseResult => {
     const result: ParseItem[] = [{ text: '', color: 'white' }];
 
-    let buf = text;
+    let position = 0;
 
-    while (buf.length > 0) {
-        const char = buf.charAt(0);
+    while (position + 1 < text.length) {
+        const char = text.charAt(position);
 
         if (char === options.formattingCharacter) {
-            const formattingCode = buf.charAt(1).toLowerCase();
+            const formattingCode = text.charAt(position + 1).toLowerCase();
 
             let item: ParseItem = result[result.length - 1];
 
@@ -56,11 +56,11 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
                 }
             }
 
-            buf = buf.slice(2);
+            position += 2;
         } else {
             result[result.length - 1].text += char;
 
-            buf = buf.slice(1);
+            position++;
         }
     }
 
@@ -72,23 +72,23 @@ const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResul
 
     const item: ParseItem = result[0];
 
-    if (((parent && parent.bold === 'true') && (chat.bold !== 'false' || !chat.bold)) || chat.bold === 'true') {
+    if (((parent && parent.bold) && !chat.bold) || chat.bold) {
         item.bold = true;
     }
 
-    if (((parent && parent.italic === 'true') && (chat.italic !== 'false' || !chat.italic)) || chat.italic === 'true') {
+    if (((parent && parent.italic) && !chat.italic) || chat.italic) {
         item.italics = true;
     }
 
-    if (((parent && parent.underlined === 'true') && (chat.underlined !== 'false' || !chat.underlined)) || chat.underlined === 'true') {
+    if (((parent && parent.underlined) && !chat.underlined) || chat.underlined) {
         item.underline = true;
     }
 
-    if (((parent && parent.strikethrough === 'true') && (chat.strikethrough !== 'false' || !chat.strikethrough)) || chat.strikethrough === 'true') {
+    if (((parent && parent.strikethrough) && !chat.strikethrough) || chat.strikethrough) {
         item.strikethrough = true;
     }
 
-    if (((parent && parent.obfuscated === 'true') && (chat.obfuscated !== 'false' || !chat.obfuscated)) || chat.obfuscated === 'true') {
+    if (((parent && parent.obfuscated) && !chat.obfuscated) || chat.obfuscated) {
         item.obfuscated = true;
     }
 
