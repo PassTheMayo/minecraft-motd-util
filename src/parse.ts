@@ -34,7 +34,7 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
 
     let position = 0;
 
-    while (position + 1 < text.length) {
+    while (position + 1 <= text.length) {
         const char = text.charAt(position);
 
         if (char === options.formattingCharacter) {
