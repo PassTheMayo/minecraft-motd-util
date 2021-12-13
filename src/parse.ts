@@ -29,75 +29,77 @@ const formattingLookupProperties: Record<string, FormattingProperties> = {
     'o': 'italics'
 };
 
+const parseBool = (value?: string | boolean): boolean => typeof value === 'boolean' ? value : typeof value === 'string' ? value.toLowerCase() === 'true' : false;
+
 const parseText = (text: string, options: ParseOptions): ParseResult => {
     const result: ParseItem[] = [{ text: '', color: 'white' }];
 
     let position = 0;
 
     while (position + 1 <= text.length) {
-        const char = text.charAt(position);
+        const character = text.charAt(position);
 
-        if (char === options.formattingCharacter) {
-            const formattingCode = text.charAt(position + 1).toLowerCase();
+        let item: ParseItem = result[result.length - 1];
 
-            let item: ParseItem = result[result.length - 1];
-
-            if (formattingCode === 'r') {
-                result.push({ text: '', color: 'white' });
-            } else {
-                if (formattingCode in formattingLookupProperties) {
-                    if (item.text.length > 0) {
-                        result.push({ ...item, text: '', [formattingLookupProperties[formattingCode]]: true })
-                    } else {
-                        item[formattingLookupProperties[formattingCode]] = true;
-                    }
-                } else if (formattingCode in colorLookupNames) {
-                    result.push({ text: '', color: colorLookupNames[formattingCode] });
-                }
-            }
-
-            position += 2;
-        } else {
-            result[result.length - 1].text += char;
+        if (character !== options.formattingCharacter) {
+            item.text += character;
 
             position++;
+
+            continue;
         }
+
+        const formattingCode = text.charAt(position + 1).toLowerCase();
+
+        if (formattingCode === 'r') {
+            result.push({ text: '', color: 'white' });
+
+            continue;
+        }
+
+        if (formattingCode in formattingLookupProperties) {
+            if (item.text.length > 0) {
+                result.push({ ...item, text: '', [formattingLookupProperties[formattingCode]]: true })
+            } else {
+                item[formattingLookupProperties[formattingCode]] = true;
+            }
+        } else if (formattingCode in colorLookupNames) {
+            result.push({ text: '', color: colorLookupNames[formattingCode] });
+        }
+
+        position += 2;
     }
 
     return result;
 };
 
 const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResult => {
-    const result: ParseResult = parseText(chat.text, options);
+    const result: ParseResult = parseText(chat.text || '', options);
 
     const item: ParseItem = result[0];
 
-    if (((parent && parent.bold) && !chat.bold) || chat.bold) {
+    if (((parent && parseBool(parent.bold)) && !parseBool(chat.bold)) || parseBool(chat.bold)) {
         item.bold = true;
     }
 
-    if (((parent && parent.italic) && !chat.italic) || chat.italic) {
+    if (((parent && parseBool(parent.italic)) && !parseBool(chat.italic)) || parseBool(chat.italic)) {
         item.italics = true;
     }
 
-    if (((parent && parent.underlined) && !chat.underlined) || chat.underlined) {
+    if (((parent && parseBool(parent.underlined)) && !parseBool(chat.underlined)) || parseBool(chat.underlined)) {
         item.underline = true;
     }
 
-    if (((parent && parent.strikethrough) && !chat.strikethrough) || chat.strikethrough) {
+    if (((parent && parseBool(parent.strikethrough)) && !parseBool(chat.strikethrough)) || parseBool(chat.strikethrough)) {
         item.strikethrough = true;
     }
 
-    if (((parent && parent.obfuscated) && !chat.obfuscated) || chat.obfuscated) {
+    if (((parent && parseBool(parent.obfuscated)) && !parseBool(chat.obfuscated)) || parseBool(chat.obfuscated)) {
         item.obfuscated = true;
     }
 
     if (chat.color) {
-        if (Object.keys(colorLookupNames).includes(chat.color)) {
-            item.color = colorLookupNames[chat.color];
-        } else {
-            item.color = chat.color;
-        }
+        item.color = colorLookupNames[chat.color ?? parent?.color ?? 'white'] || chat.color;
     }
 
     if (chat.extra) {
@@ -110,18 +112,26 @@ const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResul
 };
 
 export const parse = (input: Chat | string, options?: ParseOptions): ParseResult => {
-    assert(typeof input === 'string' || typeof input === 'object', `Expected 'input' to be typeof 'string' or 'object', received '${typeof input}'`);
-
-    const opts = Object.assign({
+    options = Object.assign({
         formattingCharacter: '\u00A7'
     }, options);
 
     let result;
 
-    if (typeof input === 'string') {
-        result = parseText(input, opts);
-    } else {
-        result = parseChat(input, opts).filter((item) => item.text.length > 0);
+    switch (typeof input) {
+        case 'string': {
+            result = parseText(input, options);
+
+            break;
+        }
+        case 'object': {
+            result = parseChat(input, options);
+
+            break;
+        }
+        default: {
+            throw new Error('Unexpected server MOTD type: ' + typeof input);
+        }
     }
 
     return result.filter((item) => item.text.length > 0);
