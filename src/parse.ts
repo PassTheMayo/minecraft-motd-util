@@ -74,7 +74,7 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
 };
 
 const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResult => {
-    const result: ParseResult = parseText(chat.text || '', options);
+    const result: ParseResult = parseText(chat.text || chat.translate || '', options);
 
     const item: ParseItem = result[0];
 

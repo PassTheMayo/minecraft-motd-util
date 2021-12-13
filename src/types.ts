@@ -37,6 +37,7 @@ export interface HTMLOptions {
 
 export interface Chat {
     text: string,
+    translate?: string,
     color?: string,
     bold?: string,
     italic?: string,
