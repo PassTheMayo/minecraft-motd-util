@@ -51,6 +51,8 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
 
         const formattingCode = text.charAt(position + 1).toLowerCase();
 
+        position += 2;
+
         if (formattingCode === 'r') {
             result.push({ text: '', color: 'white' });
 
@@ -66,8 +68,6 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
         } else if (formattingCode in colorLookupNames) {
             result.push({ text: '', color: colorLookupNames[formattingCode] });
         }
-
-        position += 2;
     }
 
     return result;
