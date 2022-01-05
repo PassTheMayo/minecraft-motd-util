@@ -41,6 +41,12 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
 
         let item: ParseItem = result[result.length - 1];
 
+        if (character === '\n') {
+            result.push({ text: '\n', color: 'white' });
+
+            continue;
+        }
+
         if (character !== options.formattingCharacter) {
             item.text += character;
 
