@@ -44,6 +44,8 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
         if (character === '\n') {
             result.push({ text: '\n', color: 'white' });
 
+            position++;
+
             continue;
         }
 

@@ -1,6 +1,6 @@
 {
 	"name": "minecraft-motd-util",
-	"version": "1.1.10",
+	"version": "1.1.11",
 	"description": "Parse and convert a Minecraft MOTD into various formats.",
 	"main": "dist/index.js",
 	"typings": "dist/index.d.ts",
