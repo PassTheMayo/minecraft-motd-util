@@ -120,12 +120,12 @@ const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResul
             item.color = colorLookupNames[parent.color] || parent.color;
         }
 
-        if (item.bold) chat.bold = 'true';
-        if (item.italics) chat.italic = 'true';
-        if (item.strikethrough) chat.strikethrough = 'true';
-        if (item.underline) chat.underlined = 'true';
-        if (item.obfuscated) chat.obfuscated = 'true';
-        if (item.color) chat.color = item.color;
+        chat.bold = item.bold ? 'true' : 'false';
+        chat.italic = item.italics ? 'true' : 'false';
+        chat.underlined = item.underline ? 'true' : 'false';
+        chat.strikethrough = item.strikethrough ? 'true' : 'false';
+        chat.obfuscated = item.obfuscated ? 'true' : 'false';
+        chat.color = item.color;
     }
 
     if (chat.extra) {
