@@ -87,22 +87,27 @@ const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResul
     const item: ParseItem = result[0];
 
     if (((parent && parseBool(parent.bold)) && !parseBool(chat.bold)) || parseBool(chat.bold)) {
+        chat.bold = 'true';
         item.bold = true;
     }
 
     if (((parent && parseBool(parent.italic)) && !parseBool(chat.italic)) || parseBool(chat.italic)) {
+        chat.italic = 'true';
         item.italics = true;
     }
 
     if (((parent && parseBool(parent.underlined)) && !parseBool(chat.underlined)) || parseBool(chat.underlined)) {
+        chat.underlined = 'true';
         item.underline = true;
     }
 
     if (((parent && parseBool(parent.strikethrough)) && !parseBool(chat.strikethrough)) || parseBool(chat.strikethrough)) {
+        chat.strikethrough = 'true';
         item.strikethrough = true;
     }
 
     if (((parent && parseBool(parent.obfuscated)) && !parseBool(chat.obfuscated)) || parseBool(chat.obfuscated)) {
+        chat.obfuscated = 'true';
         item.obfuscated = true;
     }
 
@@ -110,6 +115,7 @@ const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResul
         item.color = colorLookupNames[chat.color] || chat.color;
     }
     else if (parent?.color) {
+        chat.color = parent.color;
         item.color = colorLookupNames[parent.color] || parent.color;
     }
 
