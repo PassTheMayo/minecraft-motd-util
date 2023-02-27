@@ -107,7 +107,10 @@ const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResul
     }
 
     if (chat.color) {
-        item.color = colorLookupNames[chat.color ?? parent?.color ?? 'white'] || chat.color;
+        item.color = colorLookupNames[chat.color] || chat.color;
+    }
+    else if (parent?.color) {
+        item.color = colorLookupNames[parent.color] || parent.color;
     }
 
     if (chat.extra) {
