@@ -82,41 +82,49 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
 };
 
 const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResult => {
-    const result: ParseResult = parseText(chat.text || chat.translate || '', options);
+    const text = chat.text || chat.translate || '';
+    let result: ParseResult;
 
-    const item: ParseItem = result[0];
-
-    if (((parent && parseBool(parent.bold)) && !parseBool(chat.bold)) || parseBool(chat.bold)) {
-        chat.bold = 'true';
-        item.bold = true;
+    if (text === '' && chat.extra && chat.extra.length > 0) {
+        result = [];
     }
+    else {
+        result = parseText(text, options);
 
-    if (((parent && parseBool(parent.italic)) && !parseBool(chat.italic)) || parseBool(chat.italic)) {
-        chat.italic = 'true';
-        item.italics = true;
-    }
+        const item: ParseItem = result[0];
 
-    if (((parent && parseBool(parent.underlined)) && !parseBool(chat.underlined)) || parseBool(chat.underlined)) {
-        chat.underlined = 'true';
-        item.underline = true;
-    }
+        if (((parent && parseBool(parent.bold)) && !parseBool(chat.bold)) || parseBool(chat.bold)) {
+            chat.bold = 'true';
+            item.bold = true;
+        }
 
-    if (((parent && parseBool(parent.strikethrough)) && !parseBool(chat.strikethrough)) || parseBool(chat.strikethrough)) {
-        chat.strikethrough = 'true';
-        item.strikethrough = true;
-    }
+        if (((parent && parseBool(parent.italic)) && !parseBool(chat.italic)) || parseBool(chat.italic)) {
+            chat.italic = 'true';
+            item.italics = true;
+        }
 
-    if (((parent && parseBool(parent.obfuscated)) && !parseBool(chat.obfuscated)) || parseBool(chat.obfuscated)) {
-        chat.obfuscated = 'true';
-        item.obfuscated = true;
-    }
+        if (((parent && parseBool(parent.underlined)) && !parseBool(chat.underlined)) || parseBool(chat.underlined)) {
+            chat.underlined = 'true';
+            item.underline = true;
+        }
 
-    if (chat.color) {
-        item.color = colorLookupNames[chat.color] || chat.color;
-    }
-    else if (parent?.color) {
-        chat.color = parent.color;
-        item.color = colorLookupNames[parent.color] || parent.color;
+        if (((parent && parseBool(parent.strikethrough)) && !parseBool(chat.strikethrough)) || parseBool(chat.strikethrough)) {
+            chat.strikethrough = 'true';
+            item.strikethrough = true;
+        }
+
+        if (((parent && parseBool(parent.obfuscated)) && !parseBool(chat.obfuscated)) || parseBool(chat.obfuscated)) {
+            chat.obfuscated = 'true';
+            item.obfuscated = true;
+        }
+
+        if (chat.color) {
+            item.color = colorLookupNames[chat.color] || chat.color;
+        }
+        else if (parent?.color) {
+            chat.color = parent.color;
+            item.color = colorLookupNames[parent.color] || parent.color;
+        }
     }
 
     if (chat.extra) {
@@ -130,7 +138,8 @@ const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResul
 
 export const parse = (input: Chat | string, options?: ParseOptions): ParseResult => {
     options = Object.assign({
-        formattingCharacter: '\u00A7'
+        formattingCharacter: '\u00A7',
+        includeEmptyText: false
     }, options);
 
     let result;
@@ -149,6 +158,10 @@ export const parse = (input: Chat | string, options?: ParseOptions): ParseResult
         default: {
             throw new Error('Unexpected server MOTD type: ' + typeof input);
         }
+    }
+
+    if (options.includeEmptyText) {
+        return result;
     }
 
     return result.filter((item) => item.text.length > 0);

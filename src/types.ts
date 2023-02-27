@@ -13,7 +13,8 @@ export interface ParseItem {
 export type ParseResult = ParseItem[];
 
 export interface ParseOptions {
-    formattingCharacter?: string
+    formattingCharacter?: string,
+    includeEmptyText?: boolean
 }
 
 export interface CleanOptions {
