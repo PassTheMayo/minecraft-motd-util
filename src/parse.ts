@@ -130,7 +130,13 @@ const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResul
 
     if (chat.extra) {
         for (const extra of chat.extra) {
-            result.push(...parseChat(extra, options, chat));
+            const extraText = extra.text || extra.translate || '';
+            if (extraText === '' && (!extra.extra || extra.extra.length === 0) && !parent) {
+                result.push({ text: '\n', color: 'white' });
+            }
+            else {
+                result.push(...parseChat(extra, options, chat));
+            }
         }
     }
 
