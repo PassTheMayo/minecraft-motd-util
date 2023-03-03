@@ -83,7 +83,6 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
 
 const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResult => {
     const result: ParseResult = parseText(chat.text || chat.translate || '', options);
-
     const item: ParseItem = result[0];
 
     if (((parent && parseBool(parent.bold)) && !parseBool(chat.bold)) || parseBool(chat.bold)) {
@@ -107,8 +106,18 @@ const parseChat = (chat: Chat, options: ParseOptions, parent?: Chat): ParseResul
     }
 
     if (chat.color) {
-        item.color = colorLookupNames[chat.color ?? parent?.color ?? 'white'] || chat.color;
+        item.color = colorLookupNames[chat.color] || chat.color;
     }
+    else if (parent?.color) {
+        item.color = colorLookupNames[parent.color] || parent.color;
+    }
+
+    chat.bold = item.bold ? 'true' : 'false';
+    chat.italic = item.italics ? 'true' : 'false';
+    chat.underlined = item.underline ? 'true' : 'false';
+    chat.strikethrough = item.strikethrough ? 'true' : 'false';
+    chat.obfuscated = item.obfuscated ? 'true' : 'false';
+    chat.color = item.color;
 
     if (chat.extra) {
         for (const extra of chat.extra) {
