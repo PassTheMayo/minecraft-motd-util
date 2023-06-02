@@ -32,7 +32,7 @@ const formattingLookupProperties: Record<string, FormattingProperties> = {
 const parseBool = (value?: string | boolean): boolean => typeof value === 'boolean' ? value : typeof value === 'string' ? value.toLowerCase() === 'true' : false;
 
 const parseText = (text: string, options: ParseOptions): ParseResult => {
-    const result: ParseItem[] = [{ text: '', color: 'white' }];
+    const result: ParseItem[] = [{ text: '', color: 'gray' }];
 
     let position = 0;
 
@@ -42,7 +42,7 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
         let item: ParseItem = result[result.length - 1];
 
         if (character === '\n') {
-            result.push({ text: '\n', color: 'white' });
+            result.push({ text: '\n', color: 'gray' });
 
             position++;
 
@@ -62,7 +62,7 @@ const parseText = (text: string, options: ParseOptions): ParseResult => {
         position += 2;
 
         if (formattingCode === 'r') {
-            result.push({ text: '', color: 'white' });
+            result.push({ text: '', color: 'gray' });
 
             continue;
         }
